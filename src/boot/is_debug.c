@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ed64_v3.h"
 
 OSPiHandle* sISVHandle; // official name : is_Handle
 
@@ -16,14 +17,14 @@ void osSyncPrintfUnused(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
 
-    _Printf(is_proutSyncPrintf, NULL, fmt, args);
+    _Printf(ed64_v3_proutSyncPrintf, NULL, fmt, args);
 }
 
 void osSyncPrintf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
 
-    _Printf(is_proutSyncPrintf, NULL, fmt, args);
+    _Printf(ed64_v3_proutSyncPrintf, NULL, fmt, args);
 }
 
 // assumption
@@ -31,7 +32,7 @@ void rmonPrintf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
 
-    _Printf(is_proutSyncPrintf, NULL, fmt, args);
+    _Printf(ed64_v3_proutSyncPrintf, NULL, fmt, args);
 }
 
 void* is_proutSyncPrintf(void* arg, const char* str, u32 count) {
