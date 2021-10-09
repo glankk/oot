@@ -10482,6 +10482,12 @@ void Player_Draw(Actor* thisx, GlobalContext* globalCtx2) {
         }
     }
 
+    {
+        void cel_test(GlobalContext *globalCtx);
+
+        cel_test(globalCtx);
+    }
+
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_player.c", 19473);
 }
 

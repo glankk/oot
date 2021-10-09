@@ -512,6 +512,7 @@ beginseg
     include "build/src/code/z_construct.o"
     include "build/data/rsp.text.o"
     include "build/data/rsp.rodata.o"
+    include "build/src/cel.o"
 endseg
 
 beginseg
