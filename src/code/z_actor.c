@@ -27,6 +27,7 @@
 #include "play_state.h"
 #include "save.h"
 #include "skin_matrix.h"
+#include "../rdb/rdb.h"
 
 #include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
 #include "overlays/actors/ovl_En_Part/z_en_part.h"
@@ -3141,10 +3142,12 @@ void Actor_FreeOverlay(ActorOverlay* actorOverlay) {
                 ACTOR_DEBUG_PRINTF(T("絶対魔法領域確保なので解放しません\n",
                                      "Absolute magic field reserved, so deallocation will not occur\n"));
                 actorOverlay->loadedRamAddr = NULL;
+                rdb_lib_changed(actorOverlay, rdb_actor_lib);
             } else {
                 ACTOR_DEBUG_PRINTF(T("オーバーレイ解放します\n", "Overlay deallocated\n"));
                 ZELDA_ARENA_FREE(actorOverlay->loadedRamAddr, "../z_actor.c", 6834);
                 actorOverlay->loadedRamAddr = NULL;
+                rdb_lib_changed(actorOverlay, rdb_actor_lib);
             }
         }
     } else {
@@ -3217,6 +3220,7 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
 
             Overlay_Load(overlayEntry->file.vromStart, overlayEntry->file.vromEnd, overlayEntry->vramStart,
                          overlayEntry->vramEnd, overlayEntry->loadedRamAddr);
+            rdb_lib_changed(overlayEntry, rdb_actor_lib);
 
             PRINTF_COLOR_GREEN();
             PRINTF("OVL(a):Seg:%08x-%08x Ram:%08x-%08x Off:%08x %s\n", overlayEntry->vramStart, overlayEntry->vramEnd,

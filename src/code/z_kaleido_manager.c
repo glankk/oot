@@ -7,6 +7,7 @@
 #include "terminal.h"
 #include "translation.h"
 #include "play_state.h"
+#include "../rdb/rdb.h"
 
 #define KALEIDO_OVERLAY(name, nameString) \
     { NULL, ROM_FILE(ovl_##name), _ovl_##name##SegmentStart, _ovl_##name##SegmentEnd, 0, nameString, }
@@ -25,6 +26,7 @@ void KaleidoManager_LoadOvl(KaleidoMgrOverlay* ovl) {
 
     ovl->loadedRamAddr = sKaleidoAreaPtr;
     Overlay_Load(ovl->file.vromStart, ovl->file.vromEnd, ovl->vramStart, ovl->vramEnd, ovl->loadedRamAddr);
+    rdb_lib_changed(ovl, rdb_kaleido_lib);
 
     PRINTF_COLOR_GREEN();
     PRINTF("OVL(k):Seg:%08x-%08x Ram:%08x-%08x Off:%08x %s\n", ovl->vramStart, ovl->vramEnd, ovl->loadedRamAddr,
@@ -42,6 +44,7 @@ void KaleidoManager_ClearOvl(KaleidoMgrOverlay* ovl) {
         bzero(ovl->loadedRamAddr, (uintptr_t)ovl->vramEnd - (uintptr_t)ovl->vramStart);
         ovl->loadedRamAddr = NULL;
         gKaleidoMgrCurOvl = NULL;
+	rdb_lib_changed(ovl, rdb_kaleido_lib);
     }
 }
 

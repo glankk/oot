@@ -6,7 +6,7 @@ OSDevMgr __osPiDevMgr = { 0 };
 
 OSPiHandle __Dom1SpeedParam;
 OSPiHandle __Dom2SpeedParam;
-static OSThread piThread;
+OSThread piThread;
 static STACK(piThreadStack, 0x1000);
 static OSMesgQueue piEventQueue;
 static OSMesg piEventBuf[2];

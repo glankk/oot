@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "mips64-ultra-elf (Linux)",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "compilerPath": "/usr/bin/mips64-ultra-elf-gcc",
+            "intelliSenseMode": "gcc-x86"
+        },
+        {
+            "name": "mips64-ultra-elf (MSYS2)",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "compilerPath": "D:\\msys64\\opt\\n64\\bin\\mips64-ultra-elf-gcc.exe",
+            "intelliSenseMode": "gcc-x86"
+        }
+    ],
+    "version": 4
+}

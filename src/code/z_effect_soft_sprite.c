@@ -8,6 +8,7 @@
 #include "frame_advance.h"
 #include "effect.h"
 #include "play_state.h"
+#include "../rdb/rdb.h"
 
 EffectSsInfo sEffectSsInfo = { 0 }; // "EffectSS2Info"
 
@@ -67,6 +68,7 @@ void EffectSs_ClearAll(PlayState* play) {
         }
 
         overlay->loadedRamAddr = NULL;
+        rdb_lib_changed(overlay, rdb_effect_lib);
         overlay++;
     }
 }
@@ -219,6 +221,7 @@ void EffectSs_Spawn(PlayState* play, s32 type, s32 priority, void* initParams) {
 
             Overlay_Load(overlayEntry->file.vromStart, overlayEntry->file.vromEnd, overlayEntry->vramStart,
                          overlayEntry->vramEnd, overlayEntry->loadedRamAddr);
+            rdb_lib_changed(overlayEntry, rdb_effect_lib);
 
             PRINTF_COLOR_GREEN();
             PRINTF("EFFECT SS OVL:SegRom %08x %08x, Seg %08x %08x, RamStart %08x, type: %d\n",

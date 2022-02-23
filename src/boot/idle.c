@@ -13,6 +13,7 @@
 #include "vi_mode.h"
 #include "thread.h"
 #include "dma.h"
+#include "../rdb/rdb.h"
 
 #pragma increment_block_number "gc-eu:192 gc-eu-mq:192 gc-jp:192 gc-jp-ce:192 gc-jp-mq:192 gc-us:192 gc-us-mq:192" \
                                "ntsc-1.0:192 ntsc-1.1:192 ntsc-1.2:192 pal-1.0:192 pal-1.1:192"
@@ -153,6 +154,9 @@ void Idle_ThreadEntry(void* arg) {
 
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPiMgrCmdQueue, sPiMgrCmdBuff, ARRAY_COUNT(sPiMgrCmdBuff));
     StackCheck_Init(&sMainStackInfo, sMainStack, STACK_TOP(sMainStack), 0, 0x400, "main");
+
+    rdb_start();
+
     osCreateThread(&sMainThread, THREAD_ID_MAIN, Main_ThreadEntry, arg, STACK_TOP(sMainStack), THREAD_PRI_MAIN_INIT);
     osStartThread(&sMainThread);
     osSetThreadPri(NULL, OS_PRIORITY_IDLE);

@@ -5,6 +5,7 @@
 #include "translation.h"
 #include "ultra64.h"
 #include "z_game_dlftbls.h"
+#include "../rdb/rdb.h"
 
 void Overlay_LoadGameState(GameStateOverlay* overlayEntry) {
     if (overlayEntry->loadedRamAddr != NULL) {
@@ -22,6 +23,8 @@ void Overlay_LoadGameState(GameStateOverlay* overlayEntry) {
             PRINTF(T("ロードに失敗しました\n", "Loading failed\n"));
             return;
         }
+
+        rdb_lib_changed(overlayEntry, rdb_gamestate_lib);
 
         PRINTF_COLOR_GREEN();
         PRINTF("OVL(d):Seg:%08x-%08x Ram:%08x-%08x Off:%08x %s\n", overlayEntry->vramStart, overlayEntry->vramEnd,
@@ -111,6 +114,7 @@ void Overlay_FreeGameState(GameStateOverlay* overlayEntry) {
 
             SYSTEM_ARENA_FREE(overlayEntry->loadedRamAddr, "../z_DLF.c", 149);
             overlayEntry->loadedRamAddr = NULL;
+            rdb_lib_changed(overlayEntry, rdb_gamestate_lib);
         }
     }
 }

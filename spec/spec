@@ -50,6 +50,12 @@ beginseg
 #else
     include "$(BUILD_DIR)/src/boot/is_debug_ique.o"
 #endif
+    include "$(BUILD_DIR)/src/rdb/ed64_x.o"
+    include "$(BUILD_DIR)/src/rdb/hb_io.o"
+    include "$(BUILD_DIR)/src/rdb/io.o"
+    include "$(BUILD_DIR)/src/rdb/pi.o"
+    include "$(BUILD_DIR)/src/rdb/rdb.o"
+    include "$(BUILD_DIR)/src/rdb/vr4300.o"
     include "$(BUILD_DIR)/src/boot/driverominit.o"
     include "$(BUILD_DIR)/src/boot/mio0.o"
 

@@ -233,5 +233,19 @@ __divdi3:                                   \n\
   .end __divdi3                             \n\
   .size __divdi3, . - __divdi3              \n\
                                             \n\
+.global __ashldi3                           \n\
+__ashldi3:                                  \n\
+    .type __ashldi3, @function              \n\
+    .ent __ashldi3                          \n\
+    dsllv $a0, $a0, $a2                     \n\
+    dsllv $a1, $a1, $a2                     \n\
+    dsll32 $a0, $a0, 0                      \n\
+    dsll32 $a1, $a1, 0                      \n\
+    dsra32 $v0, $a0, 0                      \n\
+    jr    $ra                               \n\
+     dsra32 $v1, $a1, 0                     \n\
+    .end __ashldi3                          \n\
+    .size __ashldi3, . - __ashldi3          \n\
+                                            \n\
     .set pop                                \n\
                                             \n");
