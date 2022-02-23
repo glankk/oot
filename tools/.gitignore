@@ -3,6 +3,7 @@
 bin2c
 elf2rom
 makeromfs
+mkdebug
 mkdmadata
 mkldscript
 preprocess_pragmas

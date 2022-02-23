@@ -3,7 +3,7 @@
 #include "stack.h"
 #include "ultra64.h"
 
-static OSThread viThread;
+OSThread viThread;
 static STACK(viThreadStack, 0x1000);
 static OSMesgQueue viEventQueue;
 static OSMesg viEventBuf[5];

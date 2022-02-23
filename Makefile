@@ -317,6 +317,7 @@ CHECK_WARNINGS += -Werror=implicit-int -Werror=implicit-function-declaration -We
 CPP        := gcc -E
 MKLDSCRIPT := tools/mkldscript
 MKDMADATA  := tools/mkdmadata
+MKDEBUG    := tools/mkdebug
 ELF2ROM    := tools/elf2rom
 BIN2C      := tools/bin2c
 N64TEXCONV := tools/assets/n64texconv/n64texconv
@@ -498,6 +499,17 @@ SPEC_O_FILES := $(shell $(CPP) $(CPPFLAGS) -I. $(SPEC) | $(BUILD_DIR_REPLACE) | 
 O_FILES := $(filter-out %_reloc.o,$(SPEC_O_FILES))
 OVL_RELOC_FILES := $(filter %_reloc.o,$(SPEC_O_FILES))
 
+SEGMENTS        := $(shell $(CPP) $(CPPFLAGS) -I. $(SPEC) | grep -o '^[ \t]*name[ \t]\+".\+"' | sed 's/.*"\(.*\)".*/\1/g' )
+DBG_DIR         := $(BUILD_DIR)/debug
+DBG_OBJ         := $(SEGMENTS:%=$(DBG_DIR)/%.o)
+DBG_OBJ_SCRIPT  := $(DBG_OBJ:.o=.ld)
+DBG_OBJ_DEP     := $(DBG_OBJ:.o=.d)
+DBG_ELF         := $(DBG_DIR)/zelda64.elf
+DBG_ELF_SCRIPT  := $(DBG_ELF:.elf=.ld)
+DBG_ELF_DEP     := $(DBG_ELF:.elf=.d)
+DBG_SCRIPT      := $(DBG_OBJ_SCRIPT) $(DBG_ELF_SCRIPT)
+DBG_DEP         := $(DBG_OBJ_DEP) $(DBG_ELF_DEP)
+
 # Automatic dependency files
 # (Only asm_processor dependencies and reloc dependencies are handled for now)
 DEP_FILES := $(O_FILES:.o=.d) $(O_FILES:.o=.asmproc.d) $(OVL_RELOC_FILES:.o=.d) $(BUILD_DIR)/spec.d
@@ -514,7 +526,8 @@ TEXTURE_FILES_OUT := $(foreach f,$(TEXTURE_FILES_PNG_EXTRACTED:.png=.inc.c),$(f:
 # create build directories
 $(shell mkdir -p $(BUILD_DIR)/baserom \
                  $(BUILD_DIR)/assets/text \
-                 $(BUILD_DIR)/linker_scripts)
+                 $(BUILD_DIR)/linker_scripts \
+                 $(DBG_DIR))
 $(shell mkdir -p $(foreach dir, \
                       $(SRC_DIRS) \
                       $(UNDECOMPILED_DATA_DIRS) \
@@ -741,13 +754,18 @@ else
 # Note that if adding additional assets directories for modding reasons these flags must also be used there
 $(BUILD_DIR)/assets/%.o: CFLAGS += -fno-zero-initialized-in-bss -fno-toplevel-reorder
 $(BUILD_DIR)/src/%.o: CFLAGS += -fexec-charset=euc-jp
-$(BUILD_DIR)/src/libultra/libc/ll.o: OPTFLAGS := -Ofast
+$(BUILD_DIR)/src/libultra/libc/ll.o: override OPTFLAGS := $(OPTFLAGS) -Ofast
 $(BUILD_DIR)/src/overlays/%.o: CFLAGS += -fno-merge-constants -mno-explicit-relocs -mno-split-addresses
+$(BUILD_DIR)/src/rdb/ed64_x.o: override OPTFLAGS := $(OPTFLAGS) -Ofast -g0
+$(BUILD_DIR)/src/rdb/io.o: override OPTFLAGS := $(OPTFLAGS) -Ofast -g0
+$(BUILD_DIR)/src/rdb/pi.o: override OPTFLAGS := $(OPTFLAGS) -Ofast -g0
+$(BUILD_DIR)/src/rdb/rdb.o: override OPTFLAGS := $(OPTFLAGS) -Ofast -g0
+$(BUILD_DIR)/src/rdb/vr4300.o: override OPTFLAGS := $(OPTFLAGS) -Ofast -g0
 endif
 
 #### Main Targets ###
 
-all: rom compress
+all: rom compress debug
 
 rom: $(ROM)
 ifneq ($(COMPARE),0)
@@ -768,6 +786,8 @@ ifneq ($(COMPARE),0)
 	@md5sum -c $(BASEROM_DIR)/checksum-compressed.md5
  endif
 endif
+
+debug: $(DBG_OBJ) $(DBG_ELF)
 
 clean:
 	$(RM) -r $(BUILD_DIR)
@@ -807,7 +827,7 @@ endif
 	$(N64_EMULATOR) $<
 
 
-.PHONY: all rom compress clean assetclean distclean venv setup disasm run
+.PHONY: all debug rom compress clean assetclean distclean venv setup disasm run
 .DEFAULT_GOAL := rom
 
 #### Various Recipes ####
@@ -844,6 +864,26 @@ $(ELF): $(TEXTURE_FILES_OUT) $(ASSET_FILES_OUT) $(O_FILES) $(OVL_RELOC_FILES) $(
 
 $(BUILD_DIR)/linker_scripts/makerom.ld: linker_scripts/makerom.ld
 	$(CPP) -I include $(CPPFLAGS) $< > $@
+
+$(DBG_SCRIPT): $(BUILD_DIR)/spec
+$(DBG_SCRIPT): %.ld: %.d
+
+$(DBG_OBJ_DEP): $(BUILD_DIR)/spec
+	$(MKDEBUG) $< $(DBG_DIR) $(@:$(DBG_DIR)/%.d=%)
+
+$(DBG_ELF_DEP): $(BUILD_DIR)/spec
+	$(MKDEBUG) $< $(DBG_DIR)
+
+ifeq ($(MAKECMDGOALS),$(filter-out clean assetclean distclean setup,$(MAKECMDGOALS)))
+-include $(DBG_DEP)
+endif
+
+$(DBG_OBJ): %.o: %.ld %.d
+	$(LD) -T $< -o $@ -Map $(@:.o=.map) -r --accept-unknown-input-arch
+
+$(DBG_ELF): $(BUILD_DIR)/linker_scripts/makerom.ld $(BUILD_DIR)/undefined_syms.txt
+$(DBG_ELF): %.elf: %.ld %.d
+	$(LD) -T $(BUILD_DIR)/linker_scripts/makerom.ld -T $(BUILD_DIR)/undefined_syms.txt -T $< -o $@ -Map $(@:.elf=.map) --accept-unknown-input-arch -z undefs
 
 ## Order-only prerequisites
 # These ensure e.g. the O_FILES are built before the OVL_RELOC_FILES.

@@ -5,7 +5,7 @@
 #define OS_MESG_BLOCK           1
 
 #ifndef BBPLAYER
-#define OS_NUM_EVENTS           15
+#define OS_NUM_EVENTS           17
 #else
 #define OS_NUM_EVENTS           31
 #endif
@@ -25,6 +25,8 @@
 #define OS_EVENT_FAULT          12    /* CPU fault event: used by rmon */
 #define OS_EVENT_THREADSTATUS   13    /* CPU thread status: used by rmon */
 #define OS_EVENT_PRENMI         14    /* Pre NMI interrupt */
+#define OS_EVENT_FIFO_OFF       15
+#define OS_EVENT_FIFO_RX        16
 #ifdef BBPLAYER
 #define OS_EVENT_FLASH          23    /* NAND flash operation complete */
 #define OS_EVENT_AES            24    /* AES decryption complete */

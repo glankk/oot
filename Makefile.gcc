@@ -1,0 +1,15 @@
+gcc_prefix_candidates = mips64-ultra-elf- mips64- mips-linux-gnu-
+
+override MIPS_BINUTILS_PREFIX := $(shell for i in $(gcc_prefix_candidates); do if type $${i}gcc >/dev/null 2>&1; then echo $${i}; break; fi done)
+ifeq ($(MIPS_BINUTILS_PREFIX),)
+$(error no mips gcc found)
+endif
+
+override COMPILER := gcc
+
+ifeq ($(DEBUG),1)
+	override OPTFLAGS = -Og -g3 -ffast-math -fno-unsafe-math-optimizations
+	override ASFLAGS = -g -march=vr4300 -32 -no-pad-sections -Iinclude -I$(EXTRACTED_DIR)
+endif
+
+-include Makefile

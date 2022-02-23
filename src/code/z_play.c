@@ -46,6 +46,7 @@
 #include "player.h"
 #include "save.h"
 #include "vis.h"
+#include "../rdb/rdb.h"
 
 #pragma increment_block_number "gc-eu:224 gc-eu-mq:224 gc-jp:224 gc-jp-ce:224 gc-jp-mq:224 gc-us:224 gc-us-mq:224" \
                                "ique-cn:224 ntsc-1.0:240 ntsc-1.1:240 ntsc-1.2:240 pal-1.0:240 pal-1.1:240"
@@ -499,6 +500,7 @@ void Play_Init(GameState* thisx) {
 #endif
 
     Actor_InitContext(this, &this->actorCtx, this->playerEntry);
+    rdb_lib_changed(NULL, NULL);
 
     // Busyloop until the room loads
     while (!Room_ProcessRoomRequest(this, &this->roomCtx)) {

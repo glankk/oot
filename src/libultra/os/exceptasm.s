@@ -13,6 +13,11 @@
 
 #define MESG(x) ((x) << 3)
 
+.section .bss
+    __except_stack:
+    .space 1024
+    __except_stack_top:
+
 .data
 .align 2
 
@@ -216,6 +221,29 @@ endrcp:
     sdc1    $f30, THREAD_FP30(k0)
 
 handle_interrupt:
+/* Check for FIFO IRQs */
+.set push
+.set at
+.set reorder
+
+	la	sp, __except_stack_top - 0x10
+	jal	__fifo_irqs_masked
+	move	s0, v0
+
+	andi	t0, s0, (1 << 0) /* FIFO_IRQ_OFF */
+	beqz	t0, no_fifo_off
+		li	a0, 15 * 8 /* OS_EVENT_FIFO_OFF */
+		jal	send_mesg
+no_fifo_off:
+
+	andi	t0, s0, (1 << 1) /* FIFO_IRQ_RX */
+	beqz	t0, no_fifo_rx
+		li	a0, 16 * 8 /* OS_EVENT_FIFO_RX */
+		jal	send_mesg
+no_fifo_rx:
+
+.set pop
+
     /* Determine the cause of the exception or interrupt and */
     /* enter appropriate handling routine */
     MFC0(   t0, C0_CAUSE)
