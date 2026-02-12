@@ -6,7 +6,7 @@
         {
             "label": "Make (Linux GCC)",
             "type": "shell",
-            "command": "make -f Makefile.gcc DEBUG=1",
+            "command": "make -f Makefile.gcc DEBUG=1 all",
             "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
